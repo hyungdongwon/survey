@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@include file = "../_include/inc_header.jsp" %>
+ <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 
 <form name='insertform'>
 	<table border='1' align='center' width='80%' height="800px" >
@@ -14,7 +15,11 @@
 		</c:if>
 		<tr>
 			<th>아이디</th>
-			<td><input type='text' name='member_id'></td>
+			<td>
+				<input type='text' id="id" name='member_id'/>
+				<button type='button' onclick='idcheck();'>아이디 체크</button> 
+				<input type='hidden' name='result' id='result'/>
+			</td>
 		</tr>
 		<tr>
 			<th>비밀번호</th>
@@ -147,15 +152,55 @@ function join(){
 		return false;
 	}
 	
+	var id = $("#id").val();
+	var result = $("#result").val();
+	
+	if(id == result && id.length > 0 && result.length > 0){
+		
+	}else{
+		alert("아이디를 다시 체크 해주세요");
+		$('#id').val('');
+		$('#result').val('');
+		$('#id').focus();
+		return false;
+	}
+	
 	if(confirm("가입하시겠습니까?")){
 		insertform.action='${path}/member/insertProc';
 		insertform.method='post';
 		insertform.submit();
 	}
+	
 }
 </script>
 
-
+<script>
+function idcheck(){
+	var id = $("#id").val();
+	
+	if(id==""){
+		alert("아이디를 입력하세요");
+		$("#id").focus();
+		return;
+	}
+	$.ajax({
+		type: "post",
+		url: "${path}/memberidcheck/idcheckProc",
+		data: $('form').serialize(),
+		success: function(data){
+			
+			$("#id").val(id);
+			$("#result").val(data);
+			if($("#result").val() == "null"){
+				$("#result").val(id);
+				alert('사용가능한 ID입니다');
+			}else{
+				alert('사용불가능 ID입니다');
+			}
+		}
+	});
+}
+</script>
 
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

@@ -49,7 +49,7 @@ public class MemberController extends HttpServlet {
 		response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		String id = (String)request.getSession().getAttribute("member_id");
-		if(!urifilename.equals("insert") && !urifilename.equals("insertProc") && !urifilename.equals("login") && !urifilename.equals("loginProc") && !urifilename.equals("insertchoose")) {
+		if(!urifilename.equals("insert") && !urifilename.equals("insertProc") && !urifilename.equals("login") && !urifilename.equals("loginProc") && !urifilename.equals("insertchoose") && !urifilename.equals("idcheckProc")) {
 			if(id == null || id.trim().equals("")) {
 				out.println("<script language='javascript'>");
 			    out.println("alert('로그인후 이용가능합니다.');");
@@ -235,6 +235,9 @@ public class MemberController extends HttpServlet {
 			}
 			response.sendRedirect(path+"/member/list");
 		}
+//회원가입 ID체크=======================================================================================
+	
+	
 //회원마이페이지=========================================================================================
 		else if(urifilename.equals("select")) {
 			MemberDTO dto = new MemberDTO();

@@ -33,6 +33,11 @@ PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
 				)
 	</select>
 	
+	<select id="idcheck" resultType="String">
+		select member_id from member where member_id = #{dto.member_id}
+	</select>
+	
+	
 	<select id="update">
 		update member set 
 		member_name=#{dto.member_name},

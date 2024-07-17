@@ -57,7 +57,17 @@ public class MemberDAO {
 		int result =  session.insert("survey.insert",map);
 		session.commit();
 		session.close();
-		return result;
+		return result; 
+	}
+	//회원가입 아이디체크
+	public String idcheck(MemberDTO dto) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("dto",dto);
+		
+		SqlSession session = MybatisManager.getInstance().openSession();
+		String returndto =  session.selectOne("survey.idcheck",map);
+		session.close();
+		return returndto;
 	}
 	
 	//회원 상세보기

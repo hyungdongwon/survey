@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="survey">
+	
+	<select id="total" resultType="int">
+		select count(*) from member
+	</select>
+	
+	<select id="login" resultType="member.model.dto.MemberDTO">
+		select * from member where member_id = #{dto.member_id} and member_password=#{dto.member_password}
+	</select>
+	
+	<select id="list" resultType= "member.model.dto.MemberDTO">
+		select *
+		from (select rownum rn, member.* from member)
+		where rn between ${firstrow} and ${lastrow}
+	</select>
+		
+	<select id="select" resultType= "member.model.dto.MemberDTO">
+		select * from member where member_id= #{dto.member_id}
+	</select>
+	
+	<select id="insert">
+		insert into member(member_no,member_id,member_password,member_level,member_name,member_birth,member_ssn,member_gender,member_age,member_phone1,member_phone2, 
+		member_phone3,member_addr1,member_addr2,member_addr3,member_addr4,member_point,member_joindate,business_number)
+		
+		 values(seq_member_no.nextval,#{dto.member_id},#{dto.member_password},#{dto.member_level},#{dto.member_name},#{dto.member_birth},#{dto.member_ssn},
+				#{dto.member_gender},#{dto.member_age},#{dto.member_phone1},#{dto.member_phone2},#{dto.member_phone3},
+				#{dto.member_addr1},#{dto.member_addr2},#{dto.member_addr3},#{dto.member_addr4},#{dto.member_point},sysdate,#{dto.business_number}
+				)
+	</select>
+	
+	<select id="update">
+		update member set 
+		member_name=#{dto.member_name},
+		member_phone1=#{dto.member_phone1},
+		member_phone2=#{dto.member_phone2},
+		member_phone3=#{dto.member_phone3},
+		member_addr1=#{dto.member_addr1},
+		member_addr2=#{dto.member_addr2},
+		member_addr3=#{dto.member_addr3},
+		member_addr4=#{dto.member_addr4} 
+		where member_id=#{dto.member_id}
+	</select>
+	
+	<select id="delete">
+		delete from member where member_id= #{dto.member_id}
+	</select>
+	
+	<select id="idCheck" resultType="String">
+		select id from member where id=#{dto.id}
+	</select>
+	
+	<select id="passwordupdate">
+		update member set 
+		member_password=#{dto.member_password} 
+		where member_id=#{dto.member_id}
+	</select>
+	
+	<select id="accumulate" resultType= "survey.model.dto.SurveyDTO" >
+		  select survey_name,survey_point_getpoint,survey_point_getdate from 
+        (select rownum rn,survey_point.* from survey_point 
+		where member_id = #{dto.member_id}
+		order by survey_point_getdate desc) s1
+        join survey s2 on s1.survey_no = s2.survey_no 
+      	where rn between ${firstrow} and ${lastrow}
+	</select>
+	
+	
+<!--=====================================================설문조사===================================================================  -->
+
+<select id="surveyinsert">
+		insert into survey(
+		survey_no, member_id, survey_name, survey_content, survey_date, survey_end, survey_point, survey_filename) values 
+		(seq_survey_survey_no.nextval, #{dto.member_id}, #{dto.survey_name}, #{dto.survey_content} ,sysdate ,#{dto.survey_end},${dto.survey_point},'file')					
+</select>
+<select id="seq_survey_survey_no" resultType="int">
+	select max(survey_no) as survey_no from survey
+</select>
+
+
+<select id="survey_questioninsert">
+		insert into survey_question(
+		survey_question_no, survey_no, question_no) values 
+		(seq_survey_question_no.nextval,${dto.survey_no}, #{dto.question_no})							
+</select>
+<select id="seq_survey_question_no" resultType="int">
+	select max(survey_question_no) as survey_question_no from survey_question
+</select>
+
+
+<select id="survey_answerinsert">
+		insert into survey_answer(
+		survey_answer_no, survey_question_no, survey_answer_content) values 
+		(survey_answer_no.nextval, ${dto.survey_question_no}, #{dto.survey_answer_content})				
+</select>
+<select id="survey_answer_no" resultType="int">
+	select max(survey_answer_no) as survey_answer_no from survey_answer
+</select>
+
+
+<select id="survey_user">
+		insert into survey_user(
+		member_id,survey_answer_no,survey_user_date) values(
+		#{dto.member_id},${dto.survey_answer_no},sysdate)		
+</select>
+
+
+
+<sql id="search">
+	select survey_name,survey_point,survey_end,survey_no,survey_date
+	from (select rownum rn, survey.* from survey 
+</sql>
+
+<sql id="search2">
+	select survey_name,survey_point,survey_end,survey_no,survey_date
+	from (select rownum rn, survey.*,member.* from survey join member on member.member_id = survey.member_id
+</sql>
+
+
+<select id="surveylist" resultType= "survey.model.dto.SurveyDTO">
+	<choose>
+		<when test="searchOption != null and searchOption !='' and searchData != null and searchData !='' and searchOption != 'survey_name_content' ">
+			<include refid='search2'></include>
+			 where ${searchOption} like '%'|| #{searchData} ||'%'
+		</when>
+		
+		<when test="searchOption != null and searchOption !='' and searchData != null and searchData !='' and searchOption == 'survey_name_content' ">
+			<include refid='search'></include>
+			 where survey_name like '%'|| #{searchData} ||'%' or survey_content like '%'|| #{searchData} ||'%'
+		</when>
+		<otherwise>
+			<include refid='search'></include>
+		</otherwise>
+	</choose>
+	  order by survey_no desc 
+	 ) where rn between ${firstrow} and ${lastrow}
+</select>
+<select id="participationCompleted"  resultType= "survey.model.dto.SurveyDTO">
+	select distinct s1.survey_no
+	from survey s1 join survey_question s2 on s1.survey_no = s2.survey_no 
+	join survey_answer s3 on s2.survey_question_no = s3.survey_question_no
+	join survey_user s4 on s3.survey_answer_no = s4.survey_answer_no
+	where s4.member_id = #{dto.member_id}
+</select>
+
+
+<select id="totalsurvey" resultType="int">
+		select count(*) from survey
+</select>	
+
+
+<select id="selectsurvey" resultType= "survey.model.dto.SurveyDTO">
+	select * from survey where survey_no = ${dto.survey_no}
+</select>
+
+<select id="selectsurvey_question" resultType= "survey.model.dto.SurveyDTO">
+	select * from survey_question where survey_no = ${dto.survey_no} order by survey_question_no asc
+</select>
+
+<select id="selectsurvey_answer" resultType= "survey.model.dto.SurveyDTO">
+	select survey_question.survey_question_no,survey_answer.survey_answer_content,survey_answer.survey_answer_no
+	from survey_question 
+	join survey_answer 
+	on survey_question.survey_question_no = survey_answer.survey_question_no
+	where survey_no = ${dto.survey_no}
+	order by survey_question_no asc
+</select>
+
+<select id="list_statistics" resultType= "survey.model.dto.SurveyDTO">
+	select survey_name,survey_point,survey_end,survey_no,survey_date
+	from (select rownum rn, survey.* from survey order by survey_no desc)
+	where rn between ${firstrow} and ${lastrow} and member_id = #{dto.member_id}
+</select>
+	
+<select id="total_survey_user" resultType="int" >
+	SELECT COUNT(DISTINCT s4.member_id) AS distinct_member_count 
+	FROM survey s1 
+	JOIN survey_question s2 ON s1.survey_no = s2.survey_no 
+	JOIN survey_answer s3 ON s2.survey_question_no = s3.survey_question_no
+	JOIN survey_user s4 ON s3.survey_answer_no = s4.survey_answer_no
+	WHERE s1.survey_no = ${dto.survey_no}
+</select>
+
+<select id="answer_count" resultType= "survey.model.dto.SurveyDTO">
+	SELECT s3.survey_answer_no, COUNT(s4.survey_answer_no) AS answer_count,s2.survey_question_no,s3.survey_answer_content
+	FROM survey s1
+	JOIN survey_question s2 ON s1.survey_no = s2.survey_no
+	LEFT JOIN survey_answer s3 ON s2.survey_question_no = s3.survey_question_no
+	LEFT JOIN survey_user s4 ON s3.survey_answer_no = s4.survey_answer_no
+	WHERE s1.survey_no = ${dto.survey_no}
+	GROUP BY s2.survey_question_no,s3.survey_answer_no,s3.survey_answer_content
+	ORDER BY s3.survey_answer_no ASC
+</select>
+
+<select id="history" resultType= "survey.model.dto.SurveyDTO">
+	 SELECT ROWNUM AS row_num,sub.survey_no,sub.survey_name,sub.survey_user_date
+    FROM (SELECT DISTINCT s1.survey_no,s1.survey_name,s4.survey_user_date
+            FROM survey s1 JOIN survey_question s2 ON s1.survey_no = s2.survey_no 
+            JOIN survey_answer s3 ON s2.survey_question_no = s3.survey_question_no
+            JOIN survey_user s4 ON s3.survey_answer_no = s4.survey_answer_no
+            WHERE s4.member_id = #{dto.member_id}) sub
+    ORDER BY sub.survey_no
+</select>
+
+<select id="insert_point">
+		insert into survey_point (member_id,survey_no,survey_point_getpoint,survey_point_getdate) 
+		values (#{dto.member_id},${dto.survey_no},#{dto.survey_point},sysdate)
+</select>
+
+
+<select id="insert_inquiry">
+	insert into inquiry (inquiry_no,member_id,inquiry_subject,inquiry_type,inquiry_content,inquiry_date,inquiry_disclosure,inquiry_complete) 
+	values 
+	(seq_inquiry_no.nextval,#{dto.member_id},#{dto.inquiry_subject},#{dto.inquiry_type},
+	#{dto.inquiry_content},sysdate,#{dto.inquiry_disclosure},#{dto.inquiry_complete})
+</select>
+
+<select id="list_inquiry" resultType= "survey.model.dto.SurveyDTO">
+	select inquiry_no,inquiry_subject,inquiry_type,inquiry_date,inquiry_disclosure,inquiry_complete,member_name
+	from (select rownum rn,inquiry.*,member.* from inquiry join member on inquiry.member_id = member.member_id)
+	where rn between ${firstrow} and ${lastrow}
+</select>
+
+<select id="inquiry_select" resultType= "survey.model.dto.SurveyDTO">
+	select * from inquiry where inquiry_no = ${dto.inquiry_no}
+</select>
+
+<select id="inquiry_update">
+	update inquiry set inquiry_subject = #{dto.inquiry_subject},inquiry_type=#{dto.inquiry_type},inquiry_content=#{dto.inquiry_content},inquiry_disclosure=#{dto.inquiry_disclosure}
+	where inquiry_no = ${dto.inquiry_no}
+</select>
+
+<select id="inquiry_delete">
+	delete from inquiry where inquiry_no = ${dto.inquiry_no}
+</select>
+
+<select id="inquiry_answer_insert">
+	insert into inquiry_answer(inquiry_answer_no,inquiry_no,member_id,inquiry_answer,inquiry_answer_date) 
+	values (seq_inquiry_answer_no.nextval,${dto.inquiry_no},#{dto.member_id},#{dto.inquiry_answer},sysdate) 
+</select>
+
+<select id="inquiry_complete_update">
+	update inquiry set inquiry_complete = #{dto.inquiry_complete}
+	where inquiry_no = #{dto.inquiry_no}
+</select>
+
+<select id="inquiry_answer" resultType= "String" >
+	select inquiry_answer from inquiry_answer where inquiry_no = #{dto.inquiry_no}
+</select>
+
+</mapper>

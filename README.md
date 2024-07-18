@@ -79,5 +79,5 @@
     관리자가 답변을 남기게되면 1:1문의목록에서 해당 1:1문의의 처리상태가 답변완료라고 바뀌게 됩니다.
 
 
-[ERD 데이터 모델링]
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/9967706a-86a1-4d5a-bbe2-a62f9078e421/1f37e53c-e9e5-4eef-a64f-6b4b61653d59/Untitled.png)
+#[ERD 데이터 모델링]
+![화면 캡처 2024-07-18 214219](https://github.com/user-attachments/assets/87bdc0dc-abde-4283-8c0f-0a217f6deb09)

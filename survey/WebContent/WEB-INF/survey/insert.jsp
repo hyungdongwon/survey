@@ -85,7 +85,7 @@
             // Append question div to the main container
             questionsContainer.appendChild(questionDiv);
         }
-
+        
         function addOption(optionsContainer) {
             const optionDiv = document.createElement('div');
             optionDiv.className = 'option';

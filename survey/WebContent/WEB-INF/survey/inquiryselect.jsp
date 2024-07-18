@@ -59,7 +59,7 @@ function delete1(){
 }
 </script>
 
-<c:if test="${member_level >= 2}">
+<c:if test="${member_level >= 2 && dto.inquiry_complete != '답변완료' }">
 <hr>
 <table border="1"  align="center" style="width:85%; height:70%;">
 	<caption style="font-weight: bolder;">답변하기</caption>

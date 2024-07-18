@@ -15,10 +15,60 @@
 		     	${dto.survey_content }
 		     </td>
 		 </tr>
-		
+		<tr>
+			<th>
+				<table border='1' align='center' width='90%'>
+					<caption>성별참여 현황</caption>
+					<tr>
+						<th>성별</th>
+						<th>응답자수</th>
+						<th>비율%</th>
+					</tr>
+					<tr>
+						<th>남자</th>
+						<th>${mentotal }명</th>
+						<th>${mentotal2 }%</th>
+					</tr>
+					<tr>
+						<th>여자</th>
+						<th>${womentotal }명</th>
+						<th>${womentotal2 }%</th>
+					</tr>
+					<tr>
+						<th>계</th>
+						<th> ${total_user }명</th>
+						<th>100%</th>
+					</tr>
+				</table>
+			</th>
+		</tr>
+		<tr>
+			<th>
+				<table border='1' align='center' width='90%'>
+					<caption>연령대별 현황</caption>
+					<tr>
+						<th>연령대</th>
+						<th>응답자수</th>
+						<th>비율%</th>
+					</tr>
+					<c:forEach var='age' items="${agelist}"> 
+						<tr>
+							<th>${age.member_age1 }0대</th>
+							<th>${age.age_count }명</th>
+							<th>${age.age_count2}%</th>
+						</tr>
+					</c:forEach>
+					<tr>
+						<th>계</th>
+						<th> ${total_user }명</th>
+						<th>100%</th>
+					</tr>
+				</table>
+			</th>
+		</tr>
 		 <c:forEach var='i' items="${list}" varStatus="status">
 		 <tr>
-		 	<td align='center'>
+		 	<th align='center'>
 		 		질문:${i.question_no}<br>
 		 		<c:forEach var='j' items="${list2[status.index]}" varStatus="jStatus">
 		 			<c:forEach var="k" items="${j}" varStatus="kStatus" >
@@ -28,13 +78,8 @@
 		 				${k}: ${val}%<br>
 		 			</c:forEach>
 		 		</c:forEach>
-		 	</td>
+		 	</th>
 		 </tr>
 		 </c:forEach>
-		 <tr>
-		 	<td align='right'>
-		 		<button type='submit'>설문조사 완료</button>
-		 	</td>
-		 </tr>
 	</table>
 </form>

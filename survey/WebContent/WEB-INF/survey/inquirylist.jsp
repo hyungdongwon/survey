@@ -14,10 +14,10 @@
 	</tr>
 	<c:forEach var="dto" items="${list}">
 	<tr>
-		<form name='form1' method='post' action="${path}/survey/inquiryselect">
+		<form id="form1" name='form1' method='post' action="${path}/survey/inquiryselect">
 			<td>${dto.inquiry_no}</td>
 			<td>${dto.inquiry_type }</td>
-			<td><a href='javascript:void(0);' onclick="aaa();">${dto.inquiry_subject }</td>
+			<td><a href='${path}/survey/inquiryselect?inquiry_no=${dto.inquiry_no}&member_name=${dto.member_name}'>${dto.inquiry_subject }</td>
 			<td>${dto.member_name }</td>
 			<td>${dto.inquiry_date }</td>
 			<td>${dto.inquiry_disclosure }</td>
@@ -25,6 +25,7 @@
 			<input type="hidden" name="member_name" value="${dto.member_name}"/>
 			<input type="hidden" name="inquiry_no" value="${dto.inquiry_no}"/>
 			<input type="hidden" name="inquiry_disclosure" value="${dto.inquiry_disclosure }"/>
+			<input type='hidden' name="inquiry_complete" value="${dto.inquiry_complete}">
 		</form>
  	</tr>
 	</c:forEach>
@@ -85,7 +86,7 @@
 </table>
 <script>
 function aaa(){
-	form1.submit();
+	document.getElementById('form1').submit();
 }
 
 </script>

@@ -14,6 +14,7 @@ public class SurveyDTO {
 	private String survey_point; 
 	private String survey_filename; 
 	
+	
 	//survey_question
 	private int survey_question_no; 
 	private String question_no;
@@ -48,8 +49,24 @@ public class SurveyDTO {
 	private String inquiry_answer;
 	private String inquiry_answer_date;
 	
+	private String member_gender;
+	private int gender_count;
 	
 	
+	
+	
+	public String getMember_gender() {
+		return member_gender;
+	}
+	public void setMember_gender(String member_gender) {
+		this.member_gender = member_gender;
+	}
+	public int getGender_count() {
+		return gender_count;
+	}
+	public void setGender_count(int gender_count) {
+		this.gender_count = gender_count;
+	}
 	public int getInquiry_answer_no() {
 		return inquiry_answer_no;
 	}

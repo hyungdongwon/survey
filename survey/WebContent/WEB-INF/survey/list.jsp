@@ -18,25 +18,33 @@
 							 참여POINT: ${dto.survey_point }<br><br><br><br><br>
 							 설문기간:<br> <fmt:parseDate value="${dto.survey_date}" var="registered" pattern="yyyy-MM-dd HH:mm:ss" />
 									<fmt:formatDate value="${registered}" pattern="yyyy-MM-dd" />~
-									<fmt:parseDate value="${dto.survey_end}" var="registered" pattern="yyyy-MM-dd HH:mm:ss" />
-									<fmt:formatDate value="${registered}" pattern="yyyy-MM-dd" /><br><br>
+									<fmt:parseDate value="${dto.survey_end}" var="registered2" pattern="yyyy-MM-dd HH:mm:ss" />
+									<fmt:formatDate value="${registered2}" pattern="yyyy-MM-dd"/><br><br>
+									<fmt:formatDate var="end" value="${registered2}" pattern="yyyy-MM-dd"/><br><br>
+									
 									<input type='hidden' name='survey_no' value="${dto.survey_no}"/>
 									<input type='hidden' name="survey_point" value="${dto.survey_point}"/>
 									<c:set var="chk" value="0" />
 									
-									<c:forEach var="i" items="${list2}">
-											<c:if test="${i.survey_no != dto.survey_no}">
-												<c:set var="chk" value="${chk+1}" />												
-											</c:if>
-									</c:forEach>
-									<c:choose>
-										<c:when test="${chk == list2size}">
-											<button type='submit' style="width:230px;">참여하기</button>
-										</c:when>
-										<c:otherwise>
-											<div style="width:230px;">[참여완료]</div>
-										</c:otherwise>
-									</c:choose>
+									<c:if test="${now <= end}">
+										<c:forEach var="i" items="${list2}">
+												<c:if test="${i.survey_no != dto.survey_no}">
+													<c:set var="chk" value="${chk+1}" />												
+												</c:if>
+										</c:forEach>
+										<c:choose>
+											<c:when test="${chk == list2size}">
+												<button type='submit' style="width:230px;">참여하기</button>
+											</c:when>
+											<c:otherwise>
+												<div style="width:230px;">[참여완료]</div>
+											</c:otherwise>
+										</c:choose>
+									</c:if>
+						
+									<c:if test="${now > end}">
+										<div style="width:230px;">[설문기간종료]</div>
+									</c:if>			
 						</form>	
 						</c:forEach>	
 						</th>

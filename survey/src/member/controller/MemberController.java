@@ -229,15 +229,21 @@ public class MemberController extends HttpServlet {
 			int result = dao.insert(dto);
 			
 			if(result == 1) {
-				System.out.println("회원가입 완료");
+				out.println("<script language='javascript'>");
+			    out.println("alert('회원가입을 환영합니다.');");
+			    out.println("window.location.href = '" + path + "/member/login';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
 			}else {
-				System.out.println("회원가입 실패 ");
+				out.println("<script language='javascript'>");
+			    out.println("alert('회원가입 실패.');");
+			    out.println("window.location.href = '" + path + "/member/insertchoose';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
 			}
-			response.sendRedirect(path+"/member/list");
-		}
-//회원가입 ID체크=======================================================================================
-	
-	
+		}	
 //회원마이페이지=========================================================================================
 		else if(urifilename.equals("select")) {
 			MemberDTO dto = new MemberDTO();

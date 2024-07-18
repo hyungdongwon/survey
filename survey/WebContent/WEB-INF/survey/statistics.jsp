@@ -10,6 +10,7 @@
 		<th>시작일자</th>
 		<th>종료일자</th>
 		<th>통계보기</th>
+		<th>설문삭제</th>
 	</tr>
 	<c:forEach var='dto' items="${list}">
 		<tr>
@@ -20,6 +21,10 @@
 				<td>${dto.survey_end }</td>
 				<input type='hidden' name='survey_no' value="${dto.survey_no}"/>
 				<td><button type='submit'>통계보기</button></td>
+			</form>
+			<form id="deleteform" name='deleteform' method='post' action="${path}/survey/surveydelete">
+				<input type='hidden' name='survey_no' value="${dto.survey_no}"/>
+				<td><button type='button' onclick="delete1();">설문삭제</button></td>
 			</form>
 		</tr>
 	</c:forEach>
@@ -73,3 +78,11 @@
 		</td>
 	</tr>
 </table>
+
+<script>
+function delete1(){
+	if(confirm('삭제하시겠습니까?')){
+		 document.getElementById('deleteform').submit();
+	}
+}
+</script>

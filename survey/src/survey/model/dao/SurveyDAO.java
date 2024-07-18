@@ -297,5 +297,36 @@ public class SurveyDAO {
 		session.close();
 		return returnString;
 	}
+	//설문조사 삭제칼럼에 삭제추가
+	public int survey_delete(SurveyDTO dto) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("dto",dto);
+		SqlSession session = MybatisManager.getInstance().openSession();
+		int result =  session.update("survey.survey_delete",map);
+		session.commit();
+		session.close();
+		return result;
+	}
+	
+	//설문조사 통계 남여비율 
+	public List gender_count(SurveyDTO dto) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("dto",dto);
+		SqlSession session = MybatisManager.getInstance().openSession();
+		List<SurveyDTO> list =  session.selectList("survey.gender_count",map);
+		session.close();
+		return list;
+	}
+	
+	//설문조사 통계 연령대별 비율
+	public List age_count(SurveyDTO dto) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("dto",dto);
+		SqlSession session = MybatisManager.getInstance().openSession();
+		List<MemberDTO> list =  session.selectList("survey.age_count",map);
+		session.close();
+		return list;
+	}
+	
 	
 }

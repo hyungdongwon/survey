@@ -22,10 +22,32 @@ public class MemberDTO {
 	 private String member_joindate;
 	 private String business_number;
 	 
+	 private String member_age1;
+	 private int age_count;
+	 private long age_count2;
 	 
 	 
 	 
-	 public String getBusiness_number() {
+
+	public String getMember_age1() {
+		return member_age1;
+	}
+	public void setMember_age1(String member_age1) {
+		this.member_age1 = member_age1;
+	}
+	public long getAge_count2() {
+		return age_count2;
+	}
+	public void setAge_count2(long age_count2) {
+		this.age_count2 = age_count2;
+	}
+	public int getAge_count() {
+		return age_count;
+	}
+	public void setAge_count(int age_count) {
+		this.age_count = age_count;
+	}
+	public String getBusiness_number() {
 		return business_number;
 	}
 	public void setBusiness_number(String business_number) {

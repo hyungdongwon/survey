@@ -2,8 +2,12 @@ package survey.controller;
 
 import java.io.IOException;
 
+
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +174,14 @@ public class SurveyController extends HttpServlet {
 			dto.setMember_id(id);
 			List<SurveyDTO> list2 = dao.participationCompleted(dto);
 			
+			Date date = new Date();
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			
+			System.out.println(formatter.format(date));
+			
+			LocalDate now = LocalDate.now();
+			
+			request.setAttribute("now", now);
 			request.setAttribute("imsigroup", imsigroup);
 			request.setAttribute("totalgroup", totalgroup);
 			request.setAttribute("group", group);
@@ -244,6 +255,23 @@ public class SurveyController extends HttpServlet {
 				}
 			}
 			int result = dao.insert_point(dto);
+			
+			if(result == 1) {
+				out.println("<script language='javascript'>");
+			    out.println("alert('설문에 참여해주셔셔 감사합니다./"+dto.getSurvey_point()+"POINT누적');");
+			    out.println("window.location.href = '"+path+"/survey/list';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
+			}else {
+				out.println("<script language='javascript'>");
+			    out.println("alert('오류발생');");
+			    out.println("window.location.href = '"+path+"/survey/list';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
+			}
+			
 		}
 //설문 통계 (자기가 작성한 설문조사만 뜨도록)==================================================================================================		
 		else if(urifilename.equals("statistics")) { 
@@ -326,19 +354,36 @@ public class SurveyController extends HttpServlet {
 			
 			int total_user = dao.total_survey_user(dto);
 			Double total_user_= Double.valueOf(total_user);
-			request.setAttribute("total_user", total_user);
+			
+			List<SurveyDTO> genderlist = dao.gender_count(dto);
+			for(int i=0; i<2; i++) {
+				if(genderlist.get(i).getMember_gender().equals("남자")) {
+					request.setAttribute("mentotal", genderlist.get(i).getGender_count());
+					request.setAttribute("mentotal2", Math.round((genderlist.get(i).getGender_count()/total_user_)*100));
+				}else {
+					request.setAttribute("womentotal", genderlist.get(i).getGender_count());
+					request.setAttribute("womentotal2", Math.round((genderlist.get(i).getGender_count()/total_user_)*100));
+				}
+			}
+			
+			
+			List<MemberDTO> agelist = dao.age_count(dto);
+			
+			for(int i=0; i<agelist.size(); i++) {
+				agelist.get(i).setAge_count2(Math.round((agelist.get(i).getAge_count()/total_user_)*100));
+			}
+			
+			
 			
 			SurveyDTO surveydto = dao.selectsurvey(dto);
 			
 			List<SurveyDTO> list = dao.selectsurvey_question(dto);
 			List<SurveyDTO> list1 = dao.answer_count(dto);
 			
-			
 			List<List<String>> list2 = new ArrayList<>();
 			
 			HashMap<String,Object> map = new HashMap<>();
-			System.out.println(total_user);
-				
+			
 			int count = 0;
 			for(int i=0; i<list.size(); i++) {
 				List<String> imsilist = new ArrayList<>();
@@ -354,6 +399,9 @@ public class SurveyController extends HttpServlet {
 				}
 				list2.add(imsilist);
 			}
+			request.setAttribute("agelist", agelist);
+			request.setAttribute("agelist", agelist);
+			request.setAttribute("total_user", total_user);
 			request.setAttribute("map", map);
 			request.setAttribute("list", list);
 			request.setAttribute("list2", list2);
@@ -361,6 +409,31 @@ public class SurveyController extends HttpServlet {
 			
 			RequestDispatcher rd = request.getRequestDispatcher(forward);
 			rd.forward(request, response);
+		}
+//설문삭제 (DB에서 삭제는 X)=======================================================================================================================
+		else if(urifilename.equals("surveydelete")) {
+			int survey_no = Integer.parseInt(request.getParameter("survey_no"));
+			SurveyDTO dto= new SurveyDTO();
+			SurveyDAO dao = new SurveyDAO();
+			dto.setSurvey_no(survey_no);
+			
+			int result =  dao.survey_delete(dto);
+			if(result == 1) {
+				out.println("<script language='javascript'>");
+			    out.println("alert('삭제완료 되었습니다.');");
+			    out.println("window.location.href = '" + path + "/survey/statistics';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
+			}else {
+				out.println("<script language='javascript'>");
+			    out.println("alert('삭제실패!');");
+			    out.println("window.location.href = '" + path + "/survey/statistics';");
+			    out.println("</script>");
+			    out.flush();
+			    return;
+			}			
+			
 		}
 //1:1문의=======================================================================================================================================		
 		else if(urifilename.equals("inquiry")) {		
@@ -480,6 +553,7 @@ public class SurveyController extends HttpServlet {
 			String inquiry_answer = dao.inquiry_answer(dto);
 			dto.setInquiry_answer(inquiry_answer);
 			dto.setMember_name(member_name);
+			
 			request.setAttribute("member_level", member_level);
 			request.setAttribute("dto", dto);
 			

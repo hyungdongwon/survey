@@ -141,7 +141,7 @@ PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
 			<include refid='search'></include>
 		</otherwise>
 	</choose>
-	  order by survey_no desc 
+	  where survey_end > sysdate-1 and survey_delete is null order by survey_no desc 
 	 ) where rn between ${firstrow} and ${lastrow}
 </select>
 <select id="participationCompleted"  resultType= "survey.model.dto.SurveyDTO">
@@ -177,7 +177,7 @@ PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
 
 <select id="list_statistics" resultType= "survey.model.dto.SurveyDTO">
 	select survey_name,survey_point,survey_end,survey_no,survey_date
-	from (select rownum rn, survey.* from survey order by survey_no desc)
+	from (select rownum rn, survey.* from survey  where survey_delete is null order by survey_no desc)
 	where rn between ${firstrow} and ${lastrow} and member_id = #{dto.member_id}
 </select>
 	
@@ -226,7 +226,7 @@ PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
 
 <select id="list_inquiry" resultType= "survey.model.dto.SurveyDTO">
 	select inquiry_no,inquiry_subject,inquiry_type,inquiry_date,inquiry_disclosure,inquiry_complete,member_name
-	from (select rownum rn,inquiry.*,member.* from inquiry join member on inquiry.member_id = member.member_id)
+	from (select rownum rn,inquiry.*,member.* from inquiry join member on inquiry.member_id = member.member_id order by inquiry_no desc)
 	where rn between ${firstrow} and ${lastrow}
 </select>
 
@@ -255,6 +255,33 @@ PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
 
 <select id="inquiry_answer" resultType= "String" >
 	select inquiry_answer from inquiry_answer where inquiry_no = #{dto.inquiry_no}
+</select>
+
+<select id="survey_delete">
+	update survey set survey_delete = '삭제' where survey_no = ${dto.survey_no}
+</select>
+
+<select id="gender_count" resultType= "survey.model.dto.SurveyDTO">
+	SELECT member_gender, COUNT(distinct s5.member_id) as gender_count
+	FROM survey s1 
+	JOIN survey_question s2 ON s1.survey_no = s2.survey_no 
+	JOIN survey_answer s3 ON s2.survey_question_no = s3.survey_question_no
+	JOIN survey_user s4 ON s3.survey_answer_no = s4.survey_answer_no
+	JOIN member s5 ON s4.member_id = s5.member_id
+	WHERE s1.survey_no = ${dto.survey_no}
+	GROUP BY member_gender
+</select>
+
+<select id="age_count" resultType= "member.model.dto.MemberDTO">
+	SELECT substr(member_age,1,1) as member_age1, COUNT(distinct s5.member_id) as age_count
+	FROM survey s1 
+	JOIN survey_question s2 ON s1.survey_no = s2.survey_no 
+	JOIN survey_answer s3 ON s2.survey_question_no = s3.survey_question_no
+	JOIN survey_user s4 ON s3.survey_answer_no = s4.survey_answer_no
+	JOIN member s5 ON s4.member_id = s5.member_id
+	WHERE s1.survey_no = ${dto.survey_no}
+	GROUP BY substr(member_age,1,1)
+	order by substr(member_age,1,1) asc
 </select>
 
 </mapper>
